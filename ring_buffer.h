@@ -24,6 +24,15 @@ RingBuffer* ringBufferInit()
     return rb;
 }
 
+RingBuffer* ringBufferReset(RingBuffer* rb)
+{
+    rb->head  = 0;
+    rb->tail = 0;
+    rb->full = false;
+    memset(rb->arr, 0, BUFFER_SIZE);
+    return rb;
+}
+
 void ringBufferDestroy(RingBuffer* rb)
 {
     free(rb);
@@ -70,4 +79,36 @@ uint8_t ringBufferRead(RingBuffer* rb)
     }
     rb->full = false;
     return data;
+}
+
+bool ringBufferFull(RingBuffer* rb)
+{
+    return rb->full;
+}
+
+bool ringBufferEmpty(RingBuffer* rb)
+{
+    return (!rb->full && (rb->tail == rb->head));
+}
+
+uint8_t ringBufferCount(RingBuffer* rb)
+{
+    uint8_t count = 0;
+    if (rb->full)
+    {
+        count = BUFFER_SIZE;
+    }
+    else if(rb->tail == rb->head)
+    {
+        count = 0;
+    }
+    else if (rb->tail > rb->head)
+    {
+        count = rb->tail - rb->head;
+    }
+    else
+    {
+        count = BUFFER_SIZE - (rb->head - rb->tail);
+    }
+    return count;
 }
